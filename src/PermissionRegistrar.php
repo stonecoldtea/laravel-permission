@@ -22,6 +22,12 @@ class PermissionRegistrar
 
     public function __construct(Gate $gate, Repository $cache)
     {
+        if(isset($GLOBALS['dokimi_cacheKey']))
+        {
+            $this->cacheKey = $GLOBALS['dokimi_cacheKey'];
+        } else {
+            $this->cacheKey = Request()->header('host');
+        }
         $this->gate = $gate;
         $this->cache = $cache;
     }
@@ -48,7 +54,12 @@ class PermissionRegistrar
     public function getPermissions(): Collection
     {
         return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () {
-            return app(Permission::class)->with('roles')->get();
+            $slug = env('APP_DOMAIN');
+            if($this->cacheKey!=$slug) // not dokimi.app
+            {
+                $slug = str_replace('.'.$slug,'',$this->cacheKey);
+            }
+            return app(Permission::class)->where('name','LIKE', $slug.'_%')->with('roles')->get();
         });
     }
 }
