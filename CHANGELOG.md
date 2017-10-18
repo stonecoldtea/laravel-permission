@@ -1,6 +1,8 @@
 # Changelog
 
 All notable changes to `laravel-permission` will be documented in this file
+## 2.7.3 - 2017-10-18
+- multi cache implementation
 
 ## 2.7.2 - 2017-10-18
 - refactor `PermissionRegistrar` to use `$gate->before()`
