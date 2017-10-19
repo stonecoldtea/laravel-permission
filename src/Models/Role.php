@@ -92,6 +92,21 @@ class Role extends Model implements RoleContract
     }
 
     /**
+     * @param string $prefix
+     * @param null $guardName
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public static function findByPrefix(string $prefix, $guardName = null)
+    {
+        $guardName = $guardName ?? config('auth.defaults.guard');
+
+        $roles = static::where('name', 'LIKE', $prefix.'_%')->where('guard_name', $guardName)->get();
+
+
+        return $roles;
+    }
+
+    /**
      * Determine if the user may perform the given permission.
      *
      * @param string|Permission $permission
