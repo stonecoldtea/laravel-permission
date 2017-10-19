@@ -107,6 +107,29 @@ class Role extends Model implements RoleContract
     }
 
     /**
+     * @param string $old_name
+     * @param string $new_name
+     * @param null $guardName
+     * @return mixed
+     */
+    public static function renameRole(string $old_name, string $new_name, $guardName = null)
+    {
+        $guardName = $guardName ?? config('auth.defaults.guard');
+
+        $role = static::where('name',$old_name)->where('guard_name', $guardName)->firstOrFail();
+        $role->name = $new_name;
+        $role->save();
+        if(isset($GLOBALS['dokimi_cacheKey']))
+        {
+            $cacheKey = $GLOBALS['dokimi_cacheKey'];
+        } else {
+            $cacheKey = Request()->header('host');
+        }
+        app()['cache']->forget($cacheKey);
+        return $role;
+    }
+
+    /**
      * Determine if the user may perform the given permission.
      *
      * @param string|Permission $permission
